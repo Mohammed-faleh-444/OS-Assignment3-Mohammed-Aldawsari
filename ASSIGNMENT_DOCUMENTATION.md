@@ -1,8 +1,8 @@
 # Assignment 3 - Complete Documentation
 
-**Student Name**: [Your Full Name]  
-**Student ID**: [Your ID]  
-**Date Submitted**: [Submission Date]
+**Student Name**: [Mohammed Faleh Aldawsari]
+**Student ID**: [444050971]
+**Date Submitted**: [2026/5/2]
 
 ---
 
@@ -31,68 +31,48 @@
 
 Document your development process with **minimum 3 entries** showing progression:
 
-### Entry 1 - [Date, Time]
-**What I implemented**: 
-
-**Challenges encountered**: 
-
-**How I solved it**: 
-
-**Testing approach**: 
-
-**Time spent**: 
+### Entry 1 - [Same Day: 4:30 PM]
+What I implemented: Forked repository cloned project, set up environment in VS Code and updated my student ID in the code.
+Challenges encountered: Understanding project structure and locating where to start editing.
+How I solved it: Carefully read README file and navigated to SchedulerSimulationSync.java.
+Testing approach: Compiled project to ensure setup was correct.
+Time spent:30 minutes
 
 ---
 
-### Entry 2 - [Date, Time]
-**What I implemented**: 
-
-**Challenges encountered**: 
-
-**How I solved it**: 
-
-**Testing approach**: 
-
-**Time spent**: 
+### Entry 2 - [Same Day: 5:00 PM]
+What I implemented: Added ReentrantLock for shared counters (contextSwitchCount, completedProcessCount, totalWaitingTime).
+Challenges encountered: Understanding race conditions in increment operations.
+How I solved it: Studied how multiple threads update shared variables and applied locking.
+Testing approach: Ran program multiple times to verify consistent counter values.
+Time spent:45 minutes
 
 ---
 
-### Entry 3 - [Date, Time]
-**What I implemented**: 
-
-**Challenges encountered**: 
-
-**How I solved it**: 
-
-**Testing approach**: 
-
-**Time spent**: 
+### Entry 3 - [Same Day: 5:45 PM]
+What I implemented: Added ReentrantLock protection for execution log (ArrayList).
+Challenges encountered: Risk of ConcurrentModificationException.
+How I solved it: Added separate lock for log operations.
+Testing approach: Verified execution logs without errors.
+Time spent:30 minutes
 
 ---
 
-### Entry 4 - [Date, Time]
-**What I implemented**: 
-
-**Challenges encountered**: 
-
-**How I solved it**: 
-
-**Testing approach**: 
-
-**Time spent**: 
+### Entry 4 - [Same Day: 6:15 PM]
+What I implemented: Implemented Semaphore for CPU scheduling control in run() and runToCompletion() methods.
+Challenges encountered: Understanding acquire() and release() usage.
+How I solved it: Followed producer-consumer concept and examples from lecture notes.
+Testing approach: Confirmed only one process runs at a time.
+Time spent:45 minutes
 
 ---
 
-### Entry 5 - [Date, Time]
-**What I implemented**: 
-
-**Challenges encountered**: 
-
-**How I solved it**: 
-
-**Testing approach**: 
-
-**Time spent**: 
+### Entry 5 - [Same Day: 6:45 PM – 7:00 PM]
+What I implemented: Final testing, debugging, documentation completion, and preparation for video recording.
+Challenges encountered: Ensuring all synchronization worked correctly without deadlocks.
+How I solved it: Reviewed try-finally blocks and tested multiple executions.
+Testing approach: Ran program multiple times successfully with consistent results.
+Time spent:15 minutes
 
 ---
 
@@ -106,7 +86,10 @@ Document your development process with **minimum 3 entries** showing progression
 
 **Your Answer**:
 
-[Your answer here - 4-6 sentences with code examples]
+[Race conditions occur when multiple threads access shared data at the same time In this program
+ contextSwitchCount, completedProcessCount, and totalWaitingTime are shared resources.
+  Without synchronization multiple threads could update these variables simultaneously causing lost updates.
+   For example two threads incrementing contextSwitchCount++ may overwrite each other resulting in incorrect counts.]
 
 ---
 
@@ -115,7 +98,10 @@ Document your development process with **minimum 3 entries** showing progression
 
 **Your Answer**:
 
-[Your answer here - explain your implementation choices]
+[ReentrantLock is used for mutual exclusion (only one thread accesses critical section). 
+Semaphore controls access based on permits (can allow multiple threads). In my code
+ I used ReentrantLock for protecting shared counters and logs because they require strict mutual exclusion.
+ I used Semaphore(1) to simulate CPU access ensuring only one process executes at a time.]
 
 ---
 
@@ -124,7 +110,10 @@ Document your development process with **minimum 3 entries** showing progression
 
 **Your Answer**:
 
-[Your answer here - reference try-finally blocks, lock ordering, etc.]
+[Deadlock occurs when threads wait forever for locks held by each other. To prevent this
+ I used try-finally blocks to ensure locks are always released.
+ I also avoided nested locks and kept critical sections short
+ This prevents threads from being stuck waiting indefinitely.]
 
 ---
 
@@ -137,7 +126,9 @@ Document your development process with **minimum 3 entries** showing progression
 
 **Your Answer**:
 
-[Your answer here - explain coarse-grained vs fine-grained locking, independence of counters, concurrency implications. Show understanding of when to use each approach. 5-8 sentences expected.]
+[I used one shared lock (coarse-grained locking) for all three counters (contextSwitchCount, completedProcessCount, totalWaitingTime). I chose this because it is simpler to implement and ensures full consistency across shared metrics.
+However, the trade-off is reduced concurrency since all counters are blocked even if unrelated. A better approach could be fine-grained locking (separate locks per counter), which allows multiple threads to update different counters simultaneously.
+Since the counters are independent, fine-grained locking would provide better performance and higher concurrency. However, coarse-grained locking is safer and easier to debug.]
 
 ---
 
@@ -145,52 +136,67 @@ Document your development process with **minimum 3 entries** showing progression
 
 ### Critical Section #1: Counter Variables
 
-**Which variables**: 
+**Which variables**: contextSwitchCount, completedProcessCount, totalWaitingTime
 
-**Why they need protection**: 
+**Why they need protection**: They are updated by multiple threads simultaneously causing race conditions.
 
-**Synchronization mechanism used**: 
+**Synchronization mechanism used**: ReentrantLock (counterLock)
 
 **Code snippet**:
 ```java
-// Paste your implementation here
+counterLock.lock();
+try {
+    contextSwitchCount++;
+} finally {
+    counterLock.unlock();
+}
 ```
 
-**Justification**: 
+**Justification**: Ensures atomic updates and prevents lost increments.
 
 ---
 
 ### Critical Section #2: Execution Log
 
-**What resource**: 
+**What resource**: executionLog (ArrayList)
 
-**Why it needs protection**: 
+**Why it needs protection**: ArrayList is not thread-safe and can crash during concurrent modification.
 
-**Synchronization mechanism used**: 
+**Synchronization mechanism used**: ReentrantLock (logLock)
 
 **Code snippet**:
 ```java
-// Paste your implementation here
+logLock.lock();
+try {
+    executionLog.add(message);
+} finally {
+    logLock.unlock();
+}
 ```
 
-**Justification**: 
+**Justification**: Prevents ConcurrentModificationException.
 
 ---
 
 ### Critical Section #3: CPU Semaphore
 
-**Purpose of semaphore**: 
+**Purpose of semaphore**: Controls CPU access so only one process executes at a time.
 
-**Number of permits and why**: 
+**Number of permits and why**: 1 permit (binary semaphore) to simulate single CPU.
 
-**Where implemented**: 
+**Where implemented**: In run() and runToCompletion()
 
 **Code snippet**:
 ```java
-// Paste your implementation here
+SharedResources.cpuSemaphore.acquire();
+try {
+    // execution
+} finally {
+    SharedResources.cpuSemaphore.release();
+}
 ```
 
-**Effect on program behavior**: 
+**Effect on program behavior**:Ensures sequential execution and prevents overlap.
 
 ---
 
@@ -201,49 +207,50 @@ Document your development process with **minimum 3 entries** showing progression
 
 **Testing procedure**: 
 ```bash
-# Commands used (run the program at least 5 times)
+javac SchedulerSimulationSync.java
+java SchedulerSimulationSync
 ```
 
-**Results**: 
+**Results**: Output values remained consistent across all runs.
 (Show that running multiple times produces consistent, correct results)
 
-**Why synchronization is necessary**: 
+**Why synchronization is necessary**: Without locks, counters would be inconsistent due to race conditions.
 (Explain what race conditions COULD occur without synchronization, even if you didn't observe them. Explain which shared resources need protection and why.)
 
-**Conclusion**: 
+**Conclusion**: Synchronization ensures deterministic results.
 
 ---
 
 ### Test 2: Exception Testing
-**What I tested**: Checking for ConcurrentModificationException
+**What I tested**: Checked for ConcurrentModificationException in logs.
 
 **Testing procedure**: 
 
-**Results**: 
+**Results**: No exceptions occurred.
 
-**What this proves**: 
+**What this proves**: Execution log is properly synchronized.
 
 ---
 
 ### Test 3: Correctness Verification
 **What I tested**: Verifying correct final values (total burst time, context switches, etc.)
 
-**Expected values**: 
+**Expected values**: Matching process completion and correct counters.
 
-**Actual values**: 
+**Actual values**: Matched expected results in all runs.
 
-**Analysis**: 
+**Analysis**: Locks ensured correct shared state updates.
 
 ---
 
 ### Test 4: Different Scenarios
-**Scenario tested**: [e.g., different time quantum, more processes, etc.]
+**Scenario tested**: Multiple runs with different process counts.
 
-**Purpose**: 
+**Purpose**: Verify stability under load.
 
-**Results**: 
+**Results**: Program remained stable and correct.
 
-**What I learned**: 
+**What I learned**:Synchronization is essential in all concurrent scenarios.
 
 ---
 
@@ -251,7 +258,11 @@ Document your development process with **minimum 3 entries** showing progression
 
 ### What I learned about synchronization:
 
-[6-8 sentences about key concepts, challenges, insights]
+[I learned that race conditions occur when multiple threads access shared data without control.
+Using ReentrantLock helped me ensure only one thread modifies critical sections at a time.
+Semaphore helped control CPU access and simulate real scheduling behavior.
+I also learned that improper synchronization can lead to incorrect results or crashes.
+This assignment improved my understanding of concurrency and thread safety.]
 
 ---
 
@@ -259,44 +270,49 @@ Document your development process with **minimum 3 entries** showing progression
 
 Give TWO examples where synchronization is critical:
 
-**Example 1**: 
+**Example 1**: Banking systems where multiple transactions update balances.
 
-**Example 2**: 
+**Example 2**: Operating systems managing CPU scheduling and resource allocation.
 
 ---
 
 ### How I would explain synchronization to others:
 
-[Explain to someone who just finished Assignment 1 - use simple terms and analogies]
+[Synchronization is like a bathroom key system—only one person can use the bathroom at a time so others must wait.
+Locks ensure only one thread accesses shared data at a time preventing conflicts.]
 
 ---
 
 ## Part 6: GitHub Repository Information
 
-**Repository URL**: 
+**Repository URL**: https://github.com/Mohammed-faleh-444/OS-Assignment3-Mohammed-Aldawsari
 
 **Number of commits**: 
 
 **Commit messages**: 
-1. 
-2. 
-3. 
-4. 
+1. set ID
+2. add imports and locks and semaphore
+3. protect counter
+4. task2: add reentrantlock to protect execution log
+5. task3: add semaphore to control concurrent CPU access
+6. task 3: add semaphore control in runToCompletion()
+7. documentation
+8. video
 
 ---
 
 ## Summary
 
-**Total time spent on assignment**: 
+**Total time spent on assignment**: 7–8 hours
 
 **Key takeaways**: 
-1. 
-2. 
-3. 
+1. Race conditions can corrupt shared data
+2. Locks ensure safe access to critical sections
+3. Semaphores control resource access
 
-**Most challenging aspect**: 
+**Most challenging aspect**: Understanding synchronization logic
 
-**What I'm most proud of**: 
+**What I'm most proud of**: Successfully preventing race conditions and making program stable
 
 ---
 
